@@ -47,7 +47,7 @@ function createWindow() {
     mainWindow.loadURL(winURL);
     // to share with renderer process
     global.WEBPACK_DEV_SERVER_URL = process.env.WEBPACK_DEV_SERVER_URL;
-    if (!process.env.IS_TEST) mainWindow.webContents.openDevTools();
+    // if (!process.env.IS_TEST) mainWindow.webContents.openDevTools();
   } else {
     createProtocol('app');
     // Load the index.html when not in development
