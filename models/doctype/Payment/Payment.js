@@ -57,7 +57,7 @@ module.exports = {
           if (doc.paymentMethod === 'Cash') {
             return { accountType: 'Cash', isGroup: 0 };
           } else {
-            return { accountType: ['in', ['Bank', 'Cash']], isGroup: 0 };
+            return { accountType: ['in', ['Bank']], isGroup: 0 };
           }
         }
       },
