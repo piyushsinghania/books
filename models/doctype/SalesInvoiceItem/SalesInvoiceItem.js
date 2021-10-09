@@ -32,7 +32,10 @@ module.exports = {
       label: 'Quantity',
       fieldtype: 'Float',
       required: 1,
-      formula: () => 1
+      formula: row => {
+        if (row.quantity) return row.quantity;
+        return 1;
+      }
     },
     {
       fieldname: 'rate',
@@ -67,7 +70,7 @@ module.exports = {
       fieldtype: 'Link',
       target: 'Tax',
       formula: (row, doc) => {
-        if (row.tax) return row.tax;
+        // if (row.tax) return row.tax;
         return doc.getFrom('Item', row.item, 'tax');
       }
     },
