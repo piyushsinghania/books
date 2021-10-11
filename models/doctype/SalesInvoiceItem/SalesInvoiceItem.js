@@ -25,17 +25,15 @@ module.exports = {
       label: 'Description',
       fieldtype: 'Text',
       formula: (row, doc) => doc.getFrom('Item', row.item, 'description'),
-      hidden: 1
+      hidden: 1,
+      formulaDependsOn: ['item']
     },
     {
       fieldname: 'quantity',
       label: 'Quantity',
       fieldtype: 'Float',
       required: 1,
-      formula: row => {
-        if (row.quantity) return row.quantity;
-        return 1;
-      }
+      formula: row => row.quantity || 1
     },
     {
       fieldname: 'rate',
@@ -46,7 +44,8 @@ module.exports = {
         let baseRate = await doc.getFrom('Item', row.item, 'rate');
         return baseRate / doc.exchangeRate;
       },
-      getCurrency: (row, doc) => doc.currency
+      getCurrency: (row, doc) => doc.currency,
+      formulaDependsOn: ['item']
     },
     {
       fieldname: 'baseRate',
@@ -70,9 +69,9 @@ module.exports = {
       fieldtype: 'Link',
       target: 'Tax',
       formula: (row, doc) => {
-        // if (row.tax) return row.tax;
         return doc.getFrom('Item', row.item, 'tax');
-      }
+      },
+      formulaDependsOn: ['item']
     },
     {
       fieldname: 'amount',
