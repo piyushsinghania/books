@@ -52,7 +52,16 @@ module.exports = class LedgerPosting {
         date: this.date || this.reference.date,
         referenceType: referenceType || this.reference.doctype,
         referenceName: referenceName || this.reference.name,
-        description: this.description,
+        description: this.reference.items
+          .reduce((acc, curr) => {
+            if (
+              curr.description &&
+              !acc.includes(curr.description.toLowerCase())
+            )
+              acc = acc.concat(curr.description.toLowerCase() + ', ');
+            return acc;
+          }, '')
+          .slice(0, -2),
         reverted: this.reverted,
         debit: 0,
         credit: 0

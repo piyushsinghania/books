@@ -24,7 +24,8 @@ class GeneralLedger {
         'referenceName',
         'debit',
         'credit',
-        'reverted'
+        'reverted',
+        'description'
       ],
       filters: filters
     });

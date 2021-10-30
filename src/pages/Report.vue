@@ -63,7 +63,13 @@
                     class="flex-shrink-0 w-4 h-4 mr-2"
                     :name="row.expanded ? 'chevron-down' : 'chevron-right'"
                   />
-                  <span class="truncate" :class="{ 'bg-gray-100': loading }">
+                  <span
+                    class="truncate"
+                    :class="{
+                      'bg-gray-100': loading,
+                      'w-28': column.fieldname === 'description'
+                    }"
+                  >
                     <component
                       :is="cellComponent(row[column.fieldname], column)"
                     />
