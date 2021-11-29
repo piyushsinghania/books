@@ -26,6 +26,11 @@ export default {
           status = 'Cancelled';
         }
 
+        if (doc.cancelled === 1) {
+          color = 'red';
+          status = 'Cancelled';
+        }
+
         return {
           template: `<Badge class="text-xs" color="${color}">${status}</Badge>`,
           components: { Badge }

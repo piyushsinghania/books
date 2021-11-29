@@ -121,7 +121,7 @@ export default {
     {
       fieldname: 'terms',
       label: 'Notes',
-      fieldtype: 'Text',
+      fieldtype: 'Text'
     },
     {
       fieldname: 'cancelled',

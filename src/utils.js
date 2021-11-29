@@ -8,12 +8,12 @@ import { IPC_ACTIONS, IPC_MESSAGES } from './messages';
 export async function showMessageDialog({
   message,
   description,
-  buttons = [],
+  buttons = []
 }) {
   const options = {
     message,
     detail: description,
-    buttons: buttons.map((a) => a.label),
+    buttons: buttons.map(a => a.label)
   };
 
   const { response } = await ipcRenderer.invoke(
@@ -28,11 +28,11 @@ export async function showMessageDialog({
 }
 
 export function deleteDocWithPrompt(doc) {
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     showMessageDialog({
       message: _('Are you sure you want to delete {0} "{1}"?', [
         doc.doctype,
-        doc.name,
+        doc.name
       ]),
       description: _('This action is permanent'),
       buttons: [
@@ -42,18 +42,52 @@ export function deleteDocWithPrompt(doc) {
             doc
               .delete()
               .then(() => resolve(true))
-              .catch((e) => {
+              .catch(e => {
                 handleErrorWithDialog(e, doc);
               });
-          },
+          }
         },
         {
           label: _('Cancel'),
           action() {
             resolve(false);
-          },
+          }
+        }
+      ]
+    });
+  });
+}
+
+export function cancelDocWithPrompt(doc) {
+  return new Promise(resolve => {
+    showMessageDialog({
+      message: _('Are you sure you want to cancel {0} "{1}"?', [
+        doc.doctype,
+        doc.name
+      ]),
+      description: _('This action is permanent'),
+      buttons: [
+        {
+          label: _('Yes'),
+          async action() {
+            const entryDoc = await frappe.getDoc(doc.doctype, doc.name);
+            entryDoc.cancelled = 1;
+            await entryDoc.update();
+            entryDoc
+              .revert()
+              .then(() => resolve(true))
+              .catch(e => {
+                handleErrorWithDialog(e, doc);
+              });
+          }
         },
-      ],
+        {
+          label: _('No'),
+          action() {
+            resolve(false);
+          }
+        }
+      ]
     });
   });
 }
@@ -97,11 +131,11 @@ export function partyWithAvatar(party) {
     data() {
       return {
         imageURL: null,
-        label: null,
+        label: null
       };
     },
     components: {
-      Avatar,
+      Avatar
     },
     async mounted() {
       this.imageURL = await frappe.db.getValue('Party', party, 'image');
@@ -112,7 +146,7 @@ export function partyWithAvatar(party) {
         <Avatar class="flex-shrink-0" :imageURL="imageURL" :label="label" size="sm" />
         <span class="ml-2 truncate">{{ label }}</span>
       </div>
-    `,
+    `
   };
 }
 
@@ -133,8 +167,8 @@ export function openQuickEdit({ doctype, name, hideFields, defaults = {} }) {
       name,
       hideFields,
       values: defaults,
-      lastRoute: currentRoute,
-    },
+      lastRoute: currentRoute
+    }
   });
 }
 
@@ -145,7 +179,7 @@ export function getErrorMessage(e, doc) {
   if (e.type === frappe.errors.LinkValidationError && canElaborate) {
     errorMessage = _('{0} {1} is linked with existing records.', [
       doctype,
-      name,
+      name
     ]);
   } else if (e.type === frappe.errors.DuplicateEntryError && canElaborate) {
     errorMessage = _('{0} {1} already exists.', [doctype, name]);
@@ -168,18 +202,35 @@ export function getActionsForDocument(doc) {
 
   let deleteAction = {
     component: {
-      template: `<span class="text-red-700">{{ _('Delete') }}</span>`,
+      template: `<span class="text-red-700">{{ _('Delete') }}</span>`
     },
     condition: (doc) =>
       !doc.isNew() && !doc.submitted && !doc.meta.isSingle && !doc.cancelled,
     action: () =>
-      deleteDocWithPrompt(doc).then((res) => {
+      deleteDocWithPrompt(doc).then(res => {
+        if (res) {
+          router.push(`/list/${doc.doctype}`);
+        }
+      })
+  };
+
+  let cancelAction = {
+    component: {
+      template: `<span class="text-red-700">{{ _('Cancel') }}</span>`
+    },
+    condition: doc =>
+      doc.submitted &&
+      !doc.cancelled &&
+      doc.baseGrandTotal !== doc.outstandingAmount,
+    action: () => {
+      cancelDocWithPrompt(doc).then(res => {
         if (res) {
           routeTo(`/list/${doc.doctype}`);
         }
-      }),
+      });
+    }
   };
-
+  
   let cancelAction = {
     component: {
       template: `<span class="text-red-700">{{ _('Cancel') }}</span>`,
@@ -200,7 +251,7 @@ export function getActionsForDocument(doc) {
       return {
         label: d.label,
         component: d.component,
-        action: d.action.bind(this, doc, router),
+        action: d.action.bind(this, doc, router)
       };
     });
 

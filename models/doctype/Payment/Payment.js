@@ -152,7 +152,7 @@ export default {
       label: 'Payment Reference',
       fieldtype: 'Table',
       childtype: 'PaymentFor',
-      required: 0,
+      required: 0
     },
     {
       fieldname: 'cancelled',
