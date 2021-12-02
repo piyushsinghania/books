@@ -103,6 +103,14 @@ const config = {
           label: _('Trial Balance'),
           route: '/report/trial-balance',
         },
+        {
+          label: _('GSTR1'),
+          route: '/report/gstr-1',
+        },
+        {
+          label: _('GSTR2'),
+          route: '/report/gstr-2',
+        },
       ],
     },
     {
