@@ -3,6 +3,15 @@
     <PageHeader>
       <h1 slot="title" class="text-2xl font-bold">{{ report.title }}</h1>
       <template slot="actions">
+        <Button
+          :icon="true"
+          @click="downloadAsJson"
+          type="primary"
+          v-if="isGstReportsPage"
+          class="ml-2 text-white text-xs"
+        >
+          {{ _('Download as JSON') }}
+        </Button>
         <SearchBar class="ml-2" />
       </template>
     </PageHeader>
@@ -17,7 +26,7 @@
           input-class="bg-gray-100"
           :df="df"
           :value="filters[df.fieldname]"
-          @change="value => onFilterChange(df, value)"
+          @change="(value) => onFilterChange(df, value)"
           :show-label="df.fieldtype === 'Check'"
         />
       </div>
@@ -30,7 +39,7 @@
               class="py-4 text-base truncate"
               :class="[
                 getColumnAlignClass(column),
-                loading ? 'text-gray-100' : 'text-gray-600'
+                loading ? 'text-gray-100' : 'text-gray-600',
               ]"
               v-for="column in columns"
               :key="column.label"
@@ -96,11 +105,11 @@ export default {
     SearchBar,
     Row,
     FormControl,
-    WithScroll
+    WithScroll,
   },
   provide() {
     return {
-      doc: this.filters
+      doc: this.filters,
     };
   },
   data() {
@@ -114,8 +123,8 @@ export default {
       filters,
       reportData: {
         rows: [],
-        columns: []
-      }
+        columns: [],
+      },
     };
   },
   async activated() {
@@ -132,7 +141,7 @@ export default {
     async fetchReportData() {
       let data = await frappe.call({
         method: this.report.method,
-        args: this.filters
+        args: this.filters,
       });
 
       let rows;
@@ -155,7 +164,7 @@ export default {
     },
 
     addTreeMeta(rows) {
-      return rows.map(row => {
+      return rows.map((row) => {
         if ('indent' in row) {
           row.isBranch = true;
           row.expanded = true;
@@ -230,13 +239,13 @@ export default {
       return {
         render(h) {
           return h('span', formattedValue);
-        }
+        },
       };
     },
 
     getColumnAlignClass(column) {
       return {
-        'text-right': ['Int', 'Float', 'Currency'].includes(column.fieldtype)
+        'text-right': ['Int', 'Float', 'Currency'].includes(column.fieldtype),
       };
     },
 
@@ -246,15 +255,18 @@ export default {
       if (row.isBranch && column === this.columns[0]) {
         treeCellClasses = [
           padding[row.indent],
-          'hover:bg-gray-100 cursor-pointer'
+          'hover:bg-gray-100 cursor-pointer',
         ];
       }
       return [
         this.getColumnAlignClass(column),
         treeCellClasses,
-        this.loading ? 'text-gray-100' : 'text-gray-900'
+        this.loading ? 'text-gray-100' : 'text-gray-900',
       ];
-    }
+    },
+    downloadAsJson() {
+      console.log('download complete');
+    },
   },
   computed: {
     columns() {
@@ -270,7 +282,7 @@ export default {
         return {
           fieldtype: 'Data',
           fieldname: `Test ${i + 1}`,
-          label: `Test ${i + 1}`
+          label: `Test ${i + 1}`,
         };
       });
       let rows = Array.from(new Array(14)).map(() => {
@@ -282,7 +294,7 @@ export default {
       });
       return {
         columns,
-        rows
+        rows,
       };
     },
     report() {
@@ -293,7 +305,7 @@ export default {
     },
     gridTemplateColumns() {
       return this.columns
-        .map(col => {
+        .map((col) => {
           let multiplier = col.width;
           if (!multiplier) {
             multiplier = 1;
@@ -304,8 +316,11 @@ export default {
           return `minmax(${minWidth}, ${maxWidth})`;
         })
         .join(' ');
-    }
-  }
+    },
+    isGstReportsPage() {
+      return this.report.title.includes('GSTR');
+    },
+  },
 };
 </script>
 
