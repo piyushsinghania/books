@@ -111,10 +111,17 @@ export default {
         }
       },
     },
+    {
+      fieldname: 'itemCode',
+      label: 'Item Code',
+      fieldtype: 'Data',
+      placeholder: 'Item Code',
+    },
   ],
   quickEditFields: [
     'rate',
     'unit',
+    'itemCode',
     'itemType',
     'tax',
     'description',
