@@ -1,5 +1,6 @@
 import ExportWizard from '../../src/components/ExportWizard';
 import { generateGstr1Json } from '../../accounting/gst';
+import { DateTime } from 'luxon';
 
 export default {
   filterFields: [
@@ -11,32 +12,34 @@ export default {
         'B2B',
         'B2C-Large',
         'B2C-Small',
-        'Nil Rated, Exempted and Non GST supplies'
+        'Nil Rated, Exempted and Non GST supplies',
       ],
       default: 'B2B',
-      size: 'small'
+      size: 'small',
     },
     {
       fieldtype: 'Data',
       label: 'Place',
       size: 'small',
       placeholder: 'Place',
-      fieldname: 'place'
+      fieldname: 'place',
     },
     {
       fieldtype: 'Date',
       label: 'From Date',
       size: 'small',
       placeholder: 'From Date',
-      fieldname: 'fromDate'
+      fieldname: 'fromDate',
+      default: DateTime.local().minus({ months: 3 }).toISODate(),
     },
     {
       fieldtype: 'Date',
       label: 'To Date',
       size: 'small',
       placeholder: 'To Date',
-      fieldname: 'toDate'
-    }
+      fieldname: 'toDate',
+      default: DateTime.local().toISODate(),
+    },
   ],
   linkFields: [
     {
@@ -44,8 +47,8 @@ export default {
       type: 'primary',
       action: async (report, filters) => {
         generateGstr1Json(report, filters);
-      }
-    }
+      },
+    },
   ],
 
   getColumns() {
@@ -114,5 +117,5 @@ export default {
         fieldtype: 'Currency',
       },
     ];
-  }
+  },
 };
