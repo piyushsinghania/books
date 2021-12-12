@@ -24,8 +24,8 @@ export default function getAugmentedParty({ country }) {
         options: ['Unregistered', 'Registered Regular', 'Consumer'],
       }
     );
-    Party.quickEditFields.push('gstin');
     Party.quickEditFields.push('gstType');
+    Party.quickEditFields.push('gstin');
   } else {
     Party.fields.splice(3, 0, {
       fieldname: 'taxId',
