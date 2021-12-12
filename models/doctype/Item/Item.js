@@ -114,7 +114,7 @@ export default {
     {
       fieldname: 'itemCode',
       label: 'Item Code',
-      fieldtype: 'Data',
+      fieldtype: 'Int',
       placeholder: 'Item Code',
     },
   ],
