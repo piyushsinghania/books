@@ -314,9 +314,6 @@ export default {
         })
         .join(' ');
     },
-    isGstReportsPage() {
-      return this.report.title.includes('GSTR');
-    },
   },
 };
 </script>
