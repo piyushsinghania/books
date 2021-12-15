@@ -59,6 +59,45 @@ const IGST = {
   'IGST-28': 28,
 };
 
+const posMap = {
+  'JAMMU AND KASHMIR': '1',
+  'HIMACHAL PRADESH': '2',
+  'PUNJAB': '3',
+  'CHANDIGARH': '4',
+  'UTTARAKHAND': '5',
+  'HARYANA': '6',
+  'DELHI': '7',
+  'RAJASTHAN': '8',
+  'UTTAR PRADESH': '9',
+  'BIHAR': '10',
+  'SIKKIM': '11',
+  'ARUNACHAL PRADESH': '12',
+  'NAGALAND': '13',
+  'MANIPUR': '14',
+  'MIZORAM': '15',
+  'TRIPURA': '16',
+  'MEGHALAYA': '17',
+  'ASSAM': '18',
+  'WEST BENGAL': '19',
+  'JHARKHAND': '20',
+  'ODISHA': '21',
+  'CHATTISGARH': '22',
+  'MADHYA PRADESH': '23',
+  'GUJARAT': '24',
+  'DADRA AND NAGAR HAVELI AND DAMAN AND DIU': '26',
+  'MAHARASHTRA': '27',
+  'KARNATAKA': '29',
+  'GOA': '30',
+  'LAKSHADWEEP': '31',
+  'KERALA': '32',
+  'TAMIL NADU': '33',
+  'PUDUCHERRY': '34',
+  'ANDAMAN AND NICOBAR ISLANDS': '35',
+  'TELANGANA': '36',
+  'ANDHRA PRADESH': '37',
+  'LADAKH': '38',
+};
+
 export async function generateGstr1Json(report, { transferType, toDate }) {
   const { gstin } = frappe.AccountingSettings
 
@@ -83,9 +122,9 @@ export async function generateGstr1Json(report, { transferType, toDate }) {
   // based condition we need to triggered different methods
   if (transferType === 'B2B') {
     gstData.b2b = await generateB2bData(report.rows);
-  } else if (transferType === 'B2CL') {
+  } else if (transferType === 'B2C-Large') {
     gstData.b2cl = await generateB2clData(report.rows);
-  } else if (transferType === 'B2CS') {
+  } else if (transferType === 'B2C-Small') {
     gstData.b2cs = await generateB2csData(report.rows);
   }
 
@@ -154,7 +193,28 @@ async function generateB2clData(invoices) {
 }
 
 async function generateB2csData(invoices) {
-  return [];
+  const { gstin } = frappe.AccountingSettings;
+  const b2cs = [];
+
+  invoices.forEach(async (invoice) => {
+
+    debugger;
+    const invRecord = {
+      "sply_ty": posMap[invoice.place.toUpperCase()] === gstin.substring(0, 2) ? "INTRA" : "INTER",
+      "pos": posMap[invoice.place.toUpperCase()],
+      "typ": "OE",
+      "txval": invoice.taxVal,
+      "rt": invoice.rate,
+      "iamt": invoice.igstAmt || 0,
+      "camt": invoice.cgstAmt || 0,
+      "samt": invoice.sgstAmt || 0,
+      "csamt": 0
+    }
+
+    b2cs.push(invRecord);
+  });
+
+  return b2cs;
 }
 
 async function getSavePath(name) {
