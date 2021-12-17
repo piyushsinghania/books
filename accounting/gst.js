@@ -59,7 +59,7 @@ const IGST = {
   'IGST-28': 28,
 };
 
-const posMap = {
+export const posMap = {
   'JAMMU AND KASHMIR': '1',
   'HIMACHAL PRADESH': '2',
   'PUNJAB': '3',
@@ -189,27 +189,72 @@ async function generateB2bData(invoices) {
 }
 
 async function generateB2clData(invoices) {
-  return [];
+  const b2cl = [];
+
+  invoices.forEach(async (invoice) => {
+
+    const stateInvoiceRecord = {
+      pos: posMap[invoice.place.toUpperCase()],
+      inv: []
+    };
+
+    const invRecord = {
+      inum: invoice.invNo,
+      idt: DateTime.fromFormat(invoice.invDate, 'yyyy-MM-dd').toFormat(
+        'dd-MM-yyyy'
+      ),
+      val: invoice.invAmt,
+      itms: [],
+    }
+
+    let items = await frappe.db
+      .knex('SalesInvoiceItem')
+      .where('parent', invRecord.inum);
+
+    items.forEach((item) => {
+      const itemRecord = {
+        num: item.hsnCode || 0,
+        itm_det: {
+          txval: item.baseAmount,
+          rt: GST[item.tax],
+          csamt: 0,
+          iamt: ((invoice.rate || 0) * item.baseAmount) / 100,
+        },
+      };
+
+      invRecord.itms.push(itemRecord);
+    });
+
+    const stateRecord = b2cl.find((b) => b.pos === posMap[invoice.place]);
+
+    if (stateRecord) {
+      stateRecord.inv.push(invRecord);
+    } else {
+      stateInvoiceRecord.inv.push(invRecord);
+      b2cl.push(stateInvoiceRecord);
+    }
+
+  })
+
+  return b2cl;
 }
 
 async function generateB2csData(invoices) {
-  const { gstin } = frappe.AccountingSettings;
   const b2cs = [];
 
   invoices.forEach(async (invoice) => {
 
     const pos = invoice.place.toUpperCase();
-    const sply_ty = posMap[pos] === gstin.substring(0, 2) ? "INTRA" : "INTER"
 
     const invRecord = {
-      "sply_ty": sply_ty,
+      "sply_ty": invoice.inState ? "INTRA" : "INTER",
       "pos": posMap[pos],
       "typ": "OE",
       "txval": invoice.taxVal,
       "rt": invoice.rate,
-      "iamt": sply_ty === 'INTER' ? (invoice.taxVal * invoice.rate / 100) : 0,
-      "camt": sply_ty === 'INTRA' ? invoice.cgstAmt : 0,
-      "samt": sply_ty === 'INTRA' ? invoice.sgstAmt : 0,
+      "iamt": !invoice.inState ? (invoice.taxVal * invoice.rate / 100) : 0,
+      "camt": invoice.inState ? invoice.cgstAmt : 0,
+      "samt": invoice.inState ? invoice.sgstAmt : 0,
       "csamt": 0
     }
 
