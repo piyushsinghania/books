@@ -198,16 +198,18 @@ async function generateB2csData(invoices) {
 
   invoices.forEach(async (invoice) => {
 
-    debugger;
+    const pos = invoice.place.toUpperCase();
+    const sply_ty = posMap[pos] === gstin.substring(0, 2) ? "INTRA" : "INTER"
+
     const invRecord = {
-      "sply_ty": posMap[invoice.place.toUpperCase()] === gstin.substring(0, 2) ? "INTRA" : "INTER",
-      "pos": posMap[invoice.place.toUpperCase()],
+      "sply_ty": sply_ty,
+      "pos": posMap[pos],
       "typ": "OE",
       "txval": invoice.taxVal,
       "rt": invoice.rate,
-      "iamt": invoice.igstAmt || 0,
-      "camt": invoice.cgstAmt || 0,
-      "samt": invoice.sgstAmt || 0,
+      "iamt": sply_ty === 'INTER' ? (invoice.taxVal * invoice.rate / 100) : 0,
+      "camt": sply_ty === 'INTRA' ? invoice.cgstAmt : 0,
+      "samt": sply_ty === 'INTRA' ? invoice.sgstAmt : 0,
       "csamt": 0
     }
 
