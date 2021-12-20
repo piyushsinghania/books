@@ -5,29 +5,31 @@ class GeneralLedger {
     const filters = {};
     if (params.account) filters.account = params.account;
     if (params.party) filters.party = params.party;
-    if (params.referenceType) filters.referenceType = params.referenceType;
+    if (params.referenceType !== 'All')
+      filters.referenceType = params.referenceType;
     if (params.referenceName) filters.referenceName = params.referenceName;
-    if (params.reverted) filters.reverted = params.reverted;
     if (params.toDate || params.fromDate) {
       filters.date = [];
       if (params.toDate) filters.date.push('<=', params.toDate);
       if (params.fromDate) filters.date.push('>=', params.fromDate);
     }
 
-    let data = await frappe.db.getAll({
-      doctype: 'AccountingLedgerEntry',
-      fields: [
-        'date',
-        'account',
-        'party',
-        'referenceType',
-        'referenceName',
-        'debit',
-        'credit',
-        'reverted'
-      ],
-      filters: filters
-    });
+    let data = (
+      await frappe.db.getAll({
+        doctype: 'AccountingLedgerEntry',
+        fields: [
+          'date',
+          'account',
+          'party',
+          'referenceType',
+          'referenceName',
+          'debit',
+          'credit',
+          'reverted',
+        ],
+        filters: filters,
+      })
+    ).filter((d) => !d.reverted || (d.reverted && params.reverted));
 
     return this.appendOpeningEntry(data);
   }
@@ -45,7 +47,7 @@ class GeneralLedger {
       credit: 0,
       balance: 0,
       referenceType: '',
-      referenceName: ''
+      referenceName: '',
     });
     for (let entry of data) {
       balance += entry.debit > 0 ? entry.debit : -entry.credit;
@@ -68,7 +70,7 @@ class GeneralLedger {
       credit: creditTotal,
       balance: balance,
       referenceType: '',
-      referenceName: ''
+      referenceName: '',
     });
     glEntries.push({
       date: '',
@@ -78,7 +80,7 @@ class GeneralLedger {
       credit: creditTotal,
       balance: balance,
       referenceType: '',
-      referenceName: ''
+      referenceName: '',
     });
     return glEntries;
   }

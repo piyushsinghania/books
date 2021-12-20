@@ -6,6 +6,7 @@ export default {
     {
       fieldtype: 'Select',
       label: 'Transfer Type',
+      placeholder: 'Transfer Type',
       fieldname: 'transferType',
       options: [
         'B2B',

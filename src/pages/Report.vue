@@ -18,9 +18,16 @@
     <div class="flex px-8 mt-2 text-base" v-if="report.filterFields">
       <div
         class="w-40 ml-2 first:ml-0"
+        :class="
+          df.fieldtype === 'Check' &&
+          'flex justify-between items-center bg-gray-100 px-2 overflow-scroll rounded'
+        "
         v-for="df in report.filterFields"
         :key="df.fieldname"
       >
+        <div v-if="df.fieldtype === 'Check'" class="text-gray-900 text-sm">
+          {{ df.label }}
+        </div>
         <FormControl
           size="small"
           input-class="bg-gray-100"
@@ -60,7 +67,7 @@
               :grid-template-columns="gridTemplateColumns"
             >
               <div
-                class="py-4 text-base truncate"
+                class="py-4 text-base overflow-scroll no-scrollbar"
                 :class="getCellClasses(row, column)"
                 v-for="column in columns"
                 :key="column.label"
