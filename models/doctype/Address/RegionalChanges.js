@@ -19,10 +19,16 @@ export default function getAugmentedAddress({ country }) {
         label: 'State',
         fieldtype: 'Select',
         placeholder: 'State',
-        options: Object.keys(stateCodeMap).map(key => capitalize(key)),
+        options: Object.keys(stateCodeMap).map((key) => capitalize(key)),
       },
       ...Address.fields.slice(cityFieldIndex + 1, Address.fields.length),
     ];
+    // Setting country as India for customers as default for SMBs in India
+    Address.fields.forEach((field) => {
+      if (field.fieldname === 'country') {
+        field.default = 'India';
+      }
+    });
   } else {
     Address.fields = [
       ...Address.fields.slice(0, cityFieldIndex + 1),
