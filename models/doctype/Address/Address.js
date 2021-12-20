@@ -2,6 +2,7 @@ export default {
   name: 'Address',
   doctype: 'DocType',
   isSingle: 0,
+  regional: 1,
   keywordFields: [
     'addressLine1',
     'addressLine2',
@@ -30,12 +31,6 @@ export default {
       placeholder: 'City / Town',
       fieldtype: 'Data',
       required: 1
-    },
-    {
-      fieldname: 'state',
-      label: 'State',
-      placeholder: 'State',
-      fieldtype: 'Data'
     },
     {
       fieldname: 'country',
@@ -90,7 +85,6 @@ export default {
     'addressLine1',
     'addressLine2',
     'city',
-    'state',
     'country',
     'postalCode'
   ],

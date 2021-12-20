@@ -1,5 +1,5 @@
 import frappe from 'frappejs';
-import { posMap } from '../../accounting/gst'
+import { stateCodeMap } from '../../accounting/gst'
 
 class BaseGSTR {
   async getCompleteReport(gstrType, filters) {
@@ -48,7 +48,7 @@ class BaseGSTR {
     row.invNo = ledgerEntry.name;
     row.invDate = ledgerEntry.date;
     row.rate = 0;
-    row.inState = gstin.substring(0, 2) === posMap[row.place];
+    row.inState = gstin.substring(0, 2) === stateCodeMap[row.place];
     row.reverseCharge = !party.gstin ? 'Y' : 'N';
     ledgerEntry.taxes?.forEach(tax => {
       row.rate += tax.rate;

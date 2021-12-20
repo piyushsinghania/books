@@ -59,7 +59,7 @@ const IGST = {
   'IGST-28': 28,
 };
 
-export const posMap = {
+export const stateCodeMap = {
   'JAMMU AND KASHMIR': '1',
   'HIMACHAL PRADESH': '2',
   'PUNJAB': '3',
@@ -194,7 +194,7 @@ async function generateB2clData(invoices) {
   invoices.forEach(async (invoice) => {
 
     const stateInvoiceRecord = {
-      pos: posMap[invoice.place.toUpperCase()],
+      pos: stateCodeMap[invoice.place.toUpperCase()],
       inv: []
     };
 
@@ -225,7 +225,7 @@ async function generateB2clData(invoices) {
       invRecord.itms.push(itemRecord);
     });
 
-    const stateRecord = b2cl.find((b) => b.pos === posMap[invoice.place]);
+    const stateRecord = b2cl.find((b) => b.pos === stateCodeMap[invoice.place]);
 
     if (stateRecord) {
       stateRecord.inv.push(invRecord);
@@ -248,7 +248,7 @@ async function generateB2csData(invoices) {
 
     const invRecord = {
       "sply_ty": invoice.inState ? "INTRA" : "INTER",
-      "pos": posMap[pos],
+      "pos": stateCodeMap[pos],
       // "OE" - Abbreviation for errors and omissions excepted.
       // https://specialties.bayt.com/en/specialties/q/53093/what-is-meant-by-e-amp-oe-on-bill-or-invoice-or-any-document/#:~:text=E%26OE%20on,not%20purposely%20written
       "typ": "OE",
