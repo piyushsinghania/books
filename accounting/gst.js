@@ -249,6 +249,8 @@ async function generateB2csData(invoices) {
     const invRecord = {
       "sply_ty": invoice.inState ? "INTRA" : "INTER",
       "pos": posMap[pos],
+      // "OE" - Abbreviation for errors and omissions excepted.
+      // https://specialties.bayt.com/en/specialties/q/53093/what-is-meant-by-e-amp-oe-on-bill-or-invoice-or-any-document/#:~:text=E%26OE%20on,not%20purposely%20written
       "typ": "OE",
       "txval": invoice.taxVal,
       "rt": invoice.rate,
